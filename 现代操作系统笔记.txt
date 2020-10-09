@@ -49,3 +49,42 @@ I/O设备实现输入输出的三种方式
 		进程间通信：合作完成某些作业的相关进程经常需要彼此通信以便同步他们的行为
 	2、地址空间
 	3、文件
+
+11、用于进程管理的系统调用
+	进程标识符PID
+	fork,shell,waitpid,execve,exec
+	cp主程序main(argc,argv,envp):
+		argc:该命令行内有关参数数目的计数器，包括程序名称
+		argv:一个指向数组的指针。该数组的元素i是指向该命令行第i个字符串的指针
+		envp:一个指向环境的指针
+			例子：      cp file1 file2 (下面是shell的程序解释)
+					
+				#define TRUE 1
+				while(TRUE){              //一直循环下去
+					type_prompt();                 //在屏幕上显示提示符                                      
+					read_command(command,parameters);     //在终端读取输入
+					if(fork() != 0) {        //派生子进程
+						//父代码
+						waitpid(-1, &status,0);
+					}else{
+						//子代码
+						execve(command,parameters,0);   //执行命令
+					}
+				}
+				其中argc=3(command, parameters,status)
+				       argv[0]指向字符串"cp"，argv[1]指向字符串"file1", argv[2]指向字符串"file2"
+	
+	UNIX进程将其存储空间划分为三段：正文段（如程序代码）、数据段（如变量）以及堆栈段。
+
+12、用于文件管理的系统调用
+	打开文件：open()。
+	这个系统调用通过绝对路径名或指向工作目录的相对路径名指定要打开文件的名称
+	代码含义：O_RDONLY(只读), O_WRONLY(只写), O_RDWR(可读可写), O_CREAT参数(创建一个新文件), close(关闭文件)
+	调用：read(), write(), lseek(), stat(), fstat()【没有包含参数，后续查全补齐】
+
+13、用于目录管理的系统调用
+	mkdir(创建空目录), rmdir(删除空目录), link(允许同一个文件以两个或多个名称出现，多数情形下是在不同的目录这样做), mount(允许将两个文件系统合并为一个)
+		例子1：link("/usr/jim/memo","/usr/ast/note"); //jim目录中的文件memo以文件名note进入ast的目录，之后/usr/jim/memo和/usr/ast/note都引用相同的文件
+		例子2：mount("/dev/sdb0","/mnt",0); //第一个参数是USB驱动器0的块特殊文件名称，第二个参数是要被安装树的位置，第三个参数说明将要安装的文件系统是可读写合适只读
+
+14、各种系统调用
